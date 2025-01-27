@@ -29,10 +29,13 @@ const PDFChat: FC = () => {
       const formData = new FormData();
       formData.append("file", file);
       setFileLoading(true);
-      const response = await fetch("http://localhost:5001/api/upload", {
-        method: "POST",
-        body: formData,
-      });
+      const response = await fetch(
+        "https://pdf-chatter-server.onrender.com/api/upload",
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
 
       const result = await response.json();
       if (response.ok) {
