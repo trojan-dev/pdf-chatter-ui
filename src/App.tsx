@@ -9,6 +9,7 @@ const PDFChat: FC = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [userMessage, setUserMessage] = useState<string>("");
   const [fileId, setFileId] = useState<string | null>(null);
+  const [fileLoading, setFileLoading] = useState<boolean>(false);
 
   const handleFileChange = async (
     event: React.ChangeEvent<HTMLInputElement>
@@ -27,23 +28,26 @@ const PDFChat: FC = () => {
     try {
       const formData = new FormData();
       formData.append("file", file);
-      const response = await fetch(
-        "https://pdf-chatter-server.onrender.com/api/upload",
-        {
-          method: "POST",
-          body: formData,
-        }
-      );
+      setFileLoading(true);
+      const response = await fetch("http://localhost:5001/api/upload", {
+        method: "POST",
+        body: formData,
+      });
 
       const result = await response.json();
       if (response.ok) {
         setFileId(result.fileId);
         alert("File uploaded and processed successfully!");
+        setFileLoading(false);
       } else {
         console.error("Error processing file:", result.message);
+        setFileLoading(false);
+        setFileId(null);
       }
     } catch (error) {
       console.error("Unexpected error:", error);
+      setFileLoading(false);
+      setFileId(null);
     }
   };
 
@@ -84,7 +88,12 @@ const PDFChat: FC = () => {
 
   return (
     <div>
-      <input type="file" accept="application/pdf" onChange={handleFileChange} />
+      <input
+        disabled={fileLoading}
+        type="file"
+        accept="application/pdf"
+        onChange={handleFileChange}
+      />
       <div>
         {messages.map((msg, index) => (
           <p
